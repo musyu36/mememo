@@ -8,6 +8,8 @@
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-database.js"></script>
 
     <script
       crossorigin
@@ -38,19 +40,32 @@
       let db = null;
 
       const Board = () => {
+        React.useEffect(() => {
+          // useEffectで最初のレンダリング時にRealtimeDatabseを読み込む
+          db = firebaseDb.ref("/room_url");
+          //   中身の取得，JSONをリアルタイムに配信してくれる受け皿
+          //   db.onでオンラインに保存されているJSONに変更がある度に，第2引数の関数を実行してstateを上書き
+          db.on("value", (value) => setCards(value.val()));
+        }, []);
+
         //   cards でテキスト内容と座標を保持
         const [cards, setCards] = React.useState(null);
-        const add = () =>
-          setCards({
-            ...cards,
-            [Math.random().toString(36).slice(-8)]: {
+        // addの処理はキーを先に追加してから，初期値でupdate
+        const add = () => {
+          const newPostKey = db.push().key;
+          db.update({
+            [newPostKey]: {
               t: "テキストを入力",
               x: Math.floor(Math.random() * (200 - 80) + 80),
               y: Math.floor(Math.random() * (200 - 80) + 80),
             },
           });
+        };
         //特定のkeyに対して更新
-        const update = (key, card) => setCards({ ...cards, [key]: card });
+        const update = (key, card) => db.update({ [key]: card });
+
+        //keyを指定して削除
+        const remove = (key) => db.child(key).remove();
 
         //   memoの位置
         const [dragging, setDragging] = React.useState({ key: "", x: 0, y: 0 });
@@ -94,6 +109,7 @@
                   })
                 }
               >
+                <button onClick={() => remove(key)}>x</button>
                 {editMode.key === key ? (
                   // editMode内にあるメモは編集状態
                   //   スプレッド構文で更新
