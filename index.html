@@ -4,6 +4,11 @@
     <meta charset="utf-8" />
     <title>Mememo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-analytics.js"></script>
+
     <script
       crossorigin
       src="https://unpkg.com/react@16/umd/react.development.js"
@@ -18,6 +23,20 @@
     ></script>
     <!-- scriptタグ内でJSXを使用できるように -->
     <script type="text/babel">
+      var firebaseConfig = {
+        apiKey: "AIzaSyDWoZ7gfWYg6DrNTkqJ4VGP1RfmRPITJl4",
+        authDomain: "mememo-df43b.firebaseapp.com",
+        databaseURL: "https://mememo-df43b.firebaseio.com",
+        projectId: "mememo-df43b",
+        storageBucket: "mememo-df43b.appspot.com",
+        messagingSenderId: "330034686094",
+        appId: "1:330034686094:web:e66f653ae7014cf854c1df",
+        measurementId: "G-XYQJTWSEJP",
+      };
+      const firebaseApp = firebase.initializeApp(firebaseConfig);
+      const firebaseDb = firebaseApp.database();
+      let db = null;
+
       const Board = () => {
         //   cards でテキスト内容と座標を保持
         const [cards, setCards] = React.useState(null);
