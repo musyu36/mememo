@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>StayHomeBoard</title>
+    <title>Mememo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script
       crossorigin
@@ -19,7 +19,29 @@
     <!-- scriptタグ内でJSXを使用できるように -->
     <script type="text/babel">
       const Board = () => {
-        return <div>Wash your hands clean!</div>;
+        //   新しいstateを追加，setPosは更新関数
+        const [pos, setPos] = React.useState({ x: 0, y: 0 });
+        return (
+          <div
+            className="canvas"
+            style={{ width: "1000px", height: "1000px", position: "relative" }}
+            onDrop={(e) => setPos({ x: e.clientX, y: e.clientY })}
+            //
+            onDragOver={(e) => e.preventDefault()}
+          >
+            <div
+              className="memo"
+              style={{
+                position: "absolute",
+                top: pos.y + "px",
+                left: pos.x + "px",
+              }}
+              draggable={true}
+            >
+              Memo
+            </div>
+          </div>
+        );
       };
       ReactDOM.render(<Board />, document.getElementById("root"));
     </script>
