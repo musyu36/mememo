@@ -19,40 +19,53 @@
     <!-- scriptタグ内でJSXを使用できるように -->
     <script type="text/babel">
       const Board = () => {
+        //   cards stateでテキスト内容と座標を保持
+        const [cards, setCards] = React.useState({
+          id1: { t: "hoge", x: 100, y: 100 },
+          id2: { t: "fuga", x: 200, y: 300 },
+        });
+
+        //特定のkeyに対して更新
+        const update = (key, card) => setCards({ ...cards, [key]: card });
+
         //   memoの位置
         const [pos, setPos] = React.useState({ x: 0, y: 0 });
-        // テキスト内容
-        const [text, setText] = React.useState("テキストを入力");
-        // 編集状態
-        const [editMode, setEditMode] = React.useState(false);
+        const [editMode, setEditMode] = React.useState({ key: "" });
+
         return (
           <div
             className="canvas"
             style={{ width: "1000px", height: "1000px", position: "relative" }}
             onDrop={(e) => setPos({ x: e.clientX, y: e.clientY })}
-            //
             onDragOver={(e) => e.preventDefault()}
           >
-            <div
-              className="memo"
-              style={{
-                position: "absolute",
-                top: pos.y + "px",
-                left: pos.x + "px",
-              }}
-              draggable={true}
-            >
-              {editMode ? (
-                // フォーカス外れた時にeditModeをfalse
-                <textarea
-                  onBlur={(e) => setEditMode(false)}
-                  onChange={(e) => setText(e.target.value)}
-                  defaultValue={text}
-                />
-              ) : (
-                <div onClick={(e) => setEditMode(true)}>{text}</div>
-              )}
-            </div>
+            {Object.keys(cards).map((key) => (
+              <div
+                key={key}
+                style={{
+                  position: "absolute",
+                  top: cards[key].y + "px",
+                  left: cards[key].x + "px",
+                }}
+                draggable={true}
+              >
+                {editMode.key === key ? (
+                  // editMode内にあるメモは編集状態
+                  //   スプレッド構文で更新
+                  <textarea
+                    onBlur={(e) => setEditMode({ key: "" })}
+                    onChange={(e) =>
+                      update(key, { ...cards[key], t: e.target.value })
+                    }
+                    defaultValue={cards[key].t}
+                  />
+                ) : (
+                  <div onClick={(e) => setEditMode({ key })}>
+                    {cards[key].t}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         );
       };
